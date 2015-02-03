@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MeetingMapper">
+
+	<!-- 미팅 스케줄 or 미팅 레코드 올리기 -->
+	<insert id="insertMeeting" parameterType="MeetingVO">
+		INSERT INTO meeting
+			(project_no, meeting_title, meeting_no, category, meeting_date, 
+			 location, content, write_member, write_date, modify_date) 
+		values(#{project_no}, #{meeting_title}, seq_meeting.nextval, #{category}, TO_DATE(#{meeting_date}, 'yyyyMMdd'), 
+			#{location}, #{content}, #{write_member}, sysdate, sysdate)
+	</insert>
+	
+	<!--미팅 스케줄 OR 미팅 레코드 목록 보기  -->
+	<select id="meetingList" parameterType="MeetingVO" resultType="MeetingVO">
+		SELECT *
+		FROM meeting
+		WHERE project_no = #{project_no}
+		     and category like #{category}
+		ORDER BY meeting_no desc
+	</select>
+	
+</mapper>

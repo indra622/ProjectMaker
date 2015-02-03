@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ProjectMapper">
+
+	<!-- 프로젝트 <전체> 목록  -->
+	<select id="projectList" resultType="ProjectVO">
+		SELECT * 
+		FROM project 
+		WHERE is_end = 'N'
+			AND end_date > sysdate
+		ORDER BY project_no desc
+	</select>
+	
+	<!-- 프로젝트 <참여> 목록  -->
+	<select id="projectJoinList">
+		SELECT *
+		FROM project
+		WHERE project_no in 
+			(SELECT project_no
+			FROM project_member
+			WHERE join_member = #{join_member} 
+		  )
+	</select>
+	
+	<!-- 프로젝트 <미참여> 목록  -->
+	<select id="projectNotJoinList">
+		SELECT *
+		FROM project
+		WHERE project_no not in 
+			(SELECT project_no
+			FROM project_member
+			WHERE join_member = #{join_member} 
+		)
+	</select> 
+	
+	<!-- 프로젝트 생성 -->
+	<insert id="createProject" parameterType="ProjectVO">
+ 	  	INSERT INTO project
+		(project_title, project_no, member_num, max_num, 
+		memo, create_date, start_date, end_date, is_end, captain) 
+		values(#{project_title}, seq_project.nextval, 1, #{max_num},
+		 'memo is empty', SYSDATE, TO_DATE(#{start_date}, 'yyyyMMdd'), TO_DATE(#{end_date}, 'yyyyMMdd'), 'N', #{captain})
+	</insert>
+	<insert id="createProjectMember" parameterType="ProjectVO">
+		 INSERT INTO project_member
+		(project_no, join_member, is_captain, join_date) 
+		values(seq_project.nextval-1, #{captain}, 'Y', sysdate)
+	</insert>
+	
+	<!-- 프로젝트 참여 여부 -->
+	<select id="alreadyJoinedProject" parameterType="ProjectMemberVO" resultType="Integer">
+		SELECT COUNT(*)
+		FROM project_member
+		WHERE PROJECT_NO = #{project_no}
+			AND join_member = #{join_member}
+	</select>
+	
+	<!--프로젝트 참여  -->
+	<insert id="projectJoin" parameterType="ProjectMemberVO">
+		INSERT INTO project_member
+		(project_no, join_member, is_captain, join_date) 
+		values(#{project_no}, #{join_member}, 'N', sysdate)
+	</insert>
+	<update id="projectMemberUpdate" parameterType="ProjectMemberVO">
+		UPDATE project
+		SET member_num = 
+		  (SELECT count(*)
+		   FROM project_member
+		   WHERE project_no = #{project_no}
+		  )
+		WHERE project_no = #{project_no}
+	</update>
+	
+</mapper>

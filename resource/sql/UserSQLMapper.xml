@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserMapper">
+
+<!-- resultType에서는 Configuration.xml에서 지정했던 typeAliases명을 사용하여 VO객체를 지정할 수 있다. 그렇지 않은 경우에는 VO객체의 이름을 포함한 패키지의 전체 경로를 지정해야한다. -->
+	<!-- 로그인 -->
+	<select id="login" parameterType="UserVO" resultType="Integer">
+		SELECT count(*) 
+		FROM member 
+		WHERE id = #{id} and password = #{password}
+	</select>
+	
+	<!-- 새 맴버 등록 -->
+	<insert id="addMember" parameterType="UserVO">
+ 	  	INSERT INTO member (id, password, email, name, phone, registry_date) 
+ 	  	values(#{id}, #{password}, #{email}, #{name}, #{phone}, sysdate) 
+	</insert>
+	
+	<!-- 아이디 중복 검사 -->
+	<select id="isExistId" parameterType="String" resultType="Integer">
+		SELECT count(*) 
+		FROM member 
+		WHERE id = #{id}
+	</select>
+	
+	<!-- 로그인한 사용자 정보 조회 -->
+	<select id="getUserInfo" parameterType="String" resultType="UserVO">
+		SELECT *
+		FROM MEMBER
+		WHERE id=#{id}
+	</select>
+	
+</mapper>

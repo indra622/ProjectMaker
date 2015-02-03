@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TaskMapper">
+
+	<!-- 업무 할당 -->
+	<insert id="assignTask" parameterType="TaskVO">
+		INSERT INTO task
+						(project_no, task_title, task_no, task_member, 
+						task_progress, due_date, write_date) 
+		values(#{project_no}, #{task_title}, seq_task.nextval, #{task_member}, 
+						#{task_progress}, TO_DATE(#{due_date}, 'yyyyMMdd'), sysdate)
+	</insert>
+	
+	<!-- 업무 목록 -->
+	<select id="taskList" parameterType="Integer" resultType="TaskVO">
+		SELECT *
+		FROM task
+		WHERE project_no = #{project_no}
+		ORDER BY task_no desc
+	</select>
+	
+	<!-- 업무 하나 선택 보기 -->
+	<select id="taskSelect" parameterType="TaskVO" resultType="TaskVO">
+		SELECT *
+		FROM task
+		WHERE project_no = #{project_no}
+		     and task_no = #{task_no}
+	</select>
+	
+	<!-- 업무 진행도 변경 -->
+	<update id="taskModifyProgress" parameterType="TaskVO">
+		UPDATE task
+		SET task_progress = #{task_progress}
+		WHERE project_no = #{project_no}
+		    and task_no = #{task_no}
+	</update>
+	
+	<!-- 나의 업무 목록 보기 -->
+	<select id="mySubtaskList" parameterType="TaskVO" resultType="TaskVO">
+		SELECT *
+		FROM task
+		WHERE project_no = #{project_no}
+			AND task_member = #{task_member }
+		ORDER BY task_no desc
+	</select>
+	
+	<!-- 업무 삭제 -->
+	<delete id="deleteTask" parameterType="TaskVO">
+		DELETE FROM TASK
+		WHERE project_no = #{project_no}
+			 AND task_no = #{task_no}
+	</delete>
+	
+	
+</mapper>
